@@ -3,6 +3,7 @@ import { Toaster } from "react-hot-toast";
 
 import Layout from "./components/Layout.jsx";
 import { FavoritesProvider } from "./context/FavoritesContext.jsx";
+import CookieConsentDialog from "./components/CookieConsentDialog.jsx";
 
 import Home from "./pages/Home.jsx";
 import Explore from "./pages/Explore.jsx";
@@ -21,6 +22,8 @@ export default function App() {
           style: { background: "#0b1220", color: "#e2e8f0", border: "1px solid #1f2937" },
         }}
       />
+
+      <CookieConsentDialog />
 
       <Layout>
         <Routes>
