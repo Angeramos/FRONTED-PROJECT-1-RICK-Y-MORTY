@@ -14,6 +14,8 @@ export default function Explore() {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
 
+  const [retryKey, setRetryKey] = useState(0);
+
   useEffect(() => {
     let active = true;
 
@@ -22,17 +24,35 @@ export default function Explore() {
       setErrorMsg("");
 
       try {
-        const data = await fetchCharacters(); // { info, results }
+        const data = await fetchCharacters();
         if (!active) return;
+
         setCharacters(data.results || []);
-        toast.success("Personajes cargados");
+        toast.success("Characters loaded");
       } catch (err) {
         if (!active) return;
-        setErrorMsg(err?.message || "Error cargando personajes");
-        toast.error("Error cargando personajes");
+
+        const offline = navigator.onLine === false;
+        const msg = offline
+          ? "No internet connection. Check your network and try again."
+          : err?.message || "Error loading characters";
+
+        setErrorMsg(msg);
+        toast.error(offline ? "No connection" : "Error loading characters");
       } finally {
         if (!active) return;
-        setLoading(false);
+        const MIN_LOADING_MS = 500;
+
+const start = performance.now();
+setLoading(true);
+
+try {
+  // ...tu fetch
+} finally {
+  const elapsed = performance.now() - start;
+  const remaining = Math.max(0, MIN_LOADING_MS - elapsed);
+  setTimeout(() => setLoading(false), remaining);
+};
       }
     }
 
@@ -40,7 +60,7 @@ export default function Explore() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [retryKey]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -57,28 +77,26 @@ export default function Explore() {
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">Explore</h1>
-          <p className="mt-2 text-slate-300">
-            Búsqueda y filtro en tiempo real.
-          </p>
+          <p className="mt-2 text-slate-300">Real-time search and filtering.</p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
           <div>
             <label htmlFor="search" className="block text-sm text-slate-300">
-              Buscar por nombre
+              Search by name
             </label>
             <input
               id="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Ej: Rick"
+              placeholder="e.g. Rick"
               className="mt-1 w-full sm:w-64 px-3 py-2 rounded-md bg-slate-950 border border-slate-700 text-slate-100 outline-none focus:ring-2 focus:ring-violet-600"
             />
           </div>
 
           <div>
             <label htmlFor="status" className="block text-sm text-slate-300">
-              Estado
+              Status
             </label>
             <select
               id="status"
@@ -86,7 +104,7 @@ export default function Explore() {
               onChange={(e) => setStatus(e.target.value)}
               className="mt-1 w-full sm:w-44 px-3 py-2 rounded-md bg-slate-950 border border-slate-700 text-slate-100 outline-none focus:ring-2 focus:ring-violet-600"
             >
-              <option value="all">Todos</option>
+              <option value="all">All</option>
               <option value="alive">Alive</option>
               <option value="dead">Dead</option>
               <option value="unknown">Unknown</option>
@@ -95,10 +113,25 @@ export default function Explore() {
         </div>
       </div>
 
-      {loading && <LoadingState label="Cargando personajes..." />}
-      {!loading && errorMsg && <ErrorState message={errorMsg} />}
+      {loading && <LoadingState label="Loading characters..." />}
+
+      {!loading && errorMsg && (
+        <div className="mt-6">
+          <ErrorState message={errorMsg} />
+          <div className="mt-4 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setRetryKey((k) => k + 1)}
+              className="px-4 py-2 rounded-md font-medium border border-slate-700 bg-slate-900 text-slate-100 hover:bg-slate-800"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
+
       {!loading && !errorMsg && filtered.length === 0 && (
-        <EmptyState message="No hay resultados con esos filtros." />
+        <EmptyState message="No results match those filters." />
       )}
 
       {!loading && !errorMsg && filtered.length > 0 && (

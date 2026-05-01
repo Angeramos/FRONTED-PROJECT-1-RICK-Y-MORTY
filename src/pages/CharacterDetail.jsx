@@ -17,6 +17,8 @@ export default function CharacterDetail() {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
 
+  const [retryKey, setRetryKey] = useState(0);
+
   useEffect(() => {
     let active = true;
 
@@ -31,8 +33,14 @@ export default function CharacterDetail() {
         setCharacter(data);
       } catch (err) {
         if (!active) return;
-        setErrorMsg(err?.message || "Error cargando el personaje");
-        toast.error("Error cargando el personaje");
+
+        const offline = navigator.onLine === false;
+        const msg = offline
+          ? "No internet connection. Check your network and try again."
+          : err?.message || "Error loading character";
+
+        setErrorMsg(msg);
+        toast.error(offline ? "No connection" : "Error loading character");
       } finally {
         if (!active) return;
         setLoading(false);
@@ -43,23 +51,30 @@ export default function CharacterDetail() {
     return () => {
       active = false;
     };
-  }, [id]);
+  }, [id, retryKey]);
+
+  // ✅ OVERRIDE DE IMAGEN + FALLBACK (Antenna Rick = 19)
+  const manualImagesById = {
+    19: "/img/Antenna_Rick.webp.png",
+  };
+  const fallbackSrc = "/img/no-image.png";
+  const imgSrc = manualImagesById[Number(id)] || character?.image || fallbackSrc;
 
   function toggleFavorite() {
     if (!character) return;
 
     if (fav) {
       removeFavorite(character.id);
-      toast.success("Quitado de favoritos");
+      toast.success("Removed from favorites");
     } else {
       addFavorite({
         id: character.id,
         name: character.name,
-        image: character.image,
+        image: imgSrc,
         status: character.status,
         species: character.species,
       });
-      toast.success("Agregado a favoritos");
+      toast.success("Added to favorites");
     }
   }
 
@@ -67,23 +82,41 @@ export default function CharacterDetail() {
     <section aria-labelledby="character-title">
       <div className="flex items-center justify-between gap-3">
         <Link to="/explore" className="text-violet-300 hover:underline">
-          ← Volver a explorar
+          ← Back to explore
         </Link>
 
         <Link to="/favorites" className="text-slate-300 hover:underline">
-          Ver favoritos
+          View favorites
         </Link>
       </div>
 
-      {loading && <LoadingState label="Cargando detalle..." />}
-      {!loading && errorMsg && <ErrorState message={errorMsg} />}
+      {loading && <LoadingState label="Loading character details..." />}
+
+      {!loading && errorMsg && (
+        <div className="mt-6">
+          <ErrorState message={errorMsg} />
+          <div className="mt-4 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setRetryKey((k) => k + 1)}
+              className="px-4 py-2 rounded-md font-medium border border-slate-700 bg-slate-900 text-slate-100 hover:bg-slate-800"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
 
       {!loading && !errorMsg && character && (
         <div className="mt-6 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-6 items-start">
           <img
-            src={character.image}
-            alt={`Foto de ${character.name}`}
+            src={imgSrc}
+            alt={`Photo of ${character.name}`}
             className="w-full max-w-[320px] md:max-w-none rounded-xl border border-slate-800"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = fallbackSrc;
+            }}
           />
 
           <div>
@@ -94,7 +127,7 @@ export default function CharacterDetail() {
             <p className="mt-2 text-slate-300">
               <span className="font-medium text-slate-200">Status:</span>{" "}
               {character.status} •{" "}
-              <span className="font-medium text-slate-200">Especie:</span>{" "}
+              <span className="font-medium text-slate-200">Species:</span>{" "}
               {character.species}
             </p>
 
@@ -107,37 +140,27 @@ export default function CharacterDetail() {
                     ? "bg-violet-600 border-violet-500 text-white"
                     : "bg-slate-950 border-slate-700 text-slate-100 hover:bg-slate-900"
                 }`}
-                aria-label={fav ? "Quitar de favoritos" : "Agregar a favoritos"}
+                aria-label={fav ? "Remove from favorites" : "Add to favorites"}
               >
-                {fav ? "♥ En favoritos" : "♡ Agregar a favoritos"}
+                {fav ? "♥ In favorites" : "♡ Add to favorites"}
               </button>
-
-              <a
-                href={character.url}
-                target="_blank"
-                rel="noreferrer"
-                className="px-4 py-2 rounded-md bg-slate-800 text-slate-100 hover:bg-slate-700"
-                aria-label="Abrir el recurso del personaje en la API (nueva pestaña)"
-              >
-                Ver en API
-              </a>
             </div>
 
             <dl className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
-                <dt className="text-sm text-slate-400">Género</dt>
+                <dt className="text-sm text-slate-400">Gender</dt>
                 <dd className="mt-1 font-semibold">{character.gender}</dd>
               </div>
               <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
-                <dt className="text-sm text-slate-400">Origen</dt>
+                <dt className="text-sm text-slate-400">Origin</dt>
                 <dd className="mt-1 font-semibold">{character.origin?.name}</dd>
               </div>
               <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
-                <dt className="text-sm text-slate-400">Ubicación</dt>
+                <dt className="text-sm text-slate-400">Location</dt>
                 <dd className="mt-1 font-semibold">{character.location?.name}</dd>
               </div>
               <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
-                <dt className="text-sm text-slate-400">Episodios</dt>
+                <dt className="text-sm text-slate-400">Episodes</dt>
                 <dd className="mt-1 font-semibold">{character.episode?.length}</dd>
               </div>
             </dl>

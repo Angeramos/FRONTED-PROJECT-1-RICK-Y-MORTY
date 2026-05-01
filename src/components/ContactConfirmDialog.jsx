@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle, useRef } from "react";
 
 const ContactConfirmDialog = forwardRef(function ContactConfirmDialog(
-  { title = "Mensaje enviado", message = "Gracias por contactarnos." },
+  { title = "Message sent", message = "Thanks for reaching out." },
   ref
 ) {
   const dialogRef = useRef(null);
@@ -32,7 +32,7 @@ const ContactConfirmDialog = forwardRef(function ContactConfirmDialog(
             className="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-500"
             autoFocus
           >
-            Cerrar
+            Close
           </button>
         </div>
       </div>

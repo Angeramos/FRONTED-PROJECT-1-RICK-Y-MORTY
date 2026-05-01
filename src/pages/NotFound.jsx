@@ -4,9 +4,9 @@ export default function NotFound() {
   return (
     <section className="py-10">
       <h1 className="text-4xl font-extrabold">404</h1>
-      <p className="mt-2 text-slate-300">Página no encontrada.</p>
+      <p className="mt-2 text-slate-300">Page not found.</p>
       <Link className="inline-block mt-6 text-violet-400 hover:underline" to="/">
-        Volver al inicio
+        Back to home
       </Link>
     </section>
   );

@@ -13,34 +13,34 @@ export default function Favorites() {
   const hasFavorites = favorites.length > 0;
 
   const sorted = useMemo(() => {
-    // orden simple por nombre
+    // simple sort by name
     return [...favorites].sort((a, b) => a.name.localeCompare(b.name));
   }, [favorites]);
 
   function confirmRemoveOne(character) {
     dialogRef.current?.open({
-      title: "Quitar de favoritos",
-      message: `¿Seguro que quieres quitar a "${character.name}" de favoritos?`,
-      confirmText: "Sí, quitar",
-      cancelText: "No, dejarlo",
+      title: "Remove from favorites",
+      message: `Are you sure you want to remove "${character.name}" from favorites?`,
+      confirmText: "Yes, remove",
+      cancelText: "No, keep it",
       danger: true,
       onConfirm: () => {
         removeFavorite(character.id);
-        toast.success("Quitado de favoritos");
+        toast.success("Removed from favorites");
       },
     });
   }
 
   function confirmClearAll() {
     dialogRef.current?.open({
-      title: "Borrar todos los favoritos",
-      message: "Esta acción no se puede deshacer. ¿Deseas continuar?",
-      confirmText: "Sí, borrar todo",
-      cancelText: "Cancelar",
+      title: "Clear all favorites",
+      message: "This action cannot be undone. Do you want to continue?",
+      confirmText: "Yes, clear all",
+      cancelText: "Cancel",
       danger: true,
       onConfirm: () => {
         clearFavorites();
-        toast.success("Favoritos borrados");
+        toast.success("Favorites cleared");
       },
     });
   }
@@ -51,7 +51,7 @@ export default function Favorites() {
         <div>
           <h1 className="text-3xl font-bold">Favorites</h1>
           <p className="mt-2 text-slate-300">
-            Tus personajes guardados (persisten en localStorage).
+            Your saved characters.
           </p>
         </div>
 
@@ -60,7 +60,7 @@ export default function Favorites() {
             to="/explore"
             className="px-4 py-2 rounded-md bg-slate-800 text-slate-100 hover:bg-slate-700"
           >
-            Explorar
+            Explore
           </Link>
 
           <button
@@ -69,13 +69,13 @@ export default function Favorites() {
             disabled={!hasFavorites}
             className="px-4 py-2 rounded-md bg-red-600/80 text-white hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Borrar todos
+            Clear all
           </button>
         </div>
       </div>
 
       {!hasFavorites && (
-        <EmptyState message="Aún no tienes favoritos. Ve a Explore y agrega algunos ♥" />
+        <EmptyState message="You don't have any favorites yet. Go to Explore and add some ♥" />
       )}
 
       {hasFavorites && (
@@ -88,7 +88,7 @@ export default function Favorites() {
               <Link to={`/character/${c.id}`} className="block">
                 <img
                   src={c.image}
-                  alt={`Foto de ${c.name}`}
+                  alt={`Photo of ${c.name}`}
                   className="w-full aspect-square object-cover"
                   loading="lazy"
                 />
@@ -105,16 +105,16 @@ export default function Favorites() {
                     to={`/character/${c.id}`}
                     className="text-sm text-violet-300 hover:underline"
                   >
-                    Ver detalle →
+                    View details →
                   </Link>
 
                   <button
                     type="button"
                     onClick={() => confirmRemoveOne(c)}
                     className="px-3 py-1 rounded-md text-xs font-medium border border-slate-700 text-slate-100 hover:bg-slate-900"
-                    aria-label={`Quitar ${c.name} de favoritos`}
+                    aria-label={`Remove ${c.name} from favorites`}
                   >
-                    Quitar
+                    Remove
                   </button>
                 </div>
               </div>

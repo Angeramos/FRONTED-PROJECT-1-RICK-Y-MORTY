@@ -27,28 +27,16 @@ export default function Navbar() {
         aria-label="Main navigation"
       >
         <NavLink to="/" className="flex items-center gap-2 text-slate-100">
-          {/* SVG inline (requisito) */}
-          <svg
-            width="28"
-            height="28"
-            viewBox="0 0 24 24"
-            fill="none"
-            role="img"
-            aria-label="Portal logo"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M12 2C7 2 3 6 3 12s4 10 9 10 9-4 9-10S17 2 12 2Z"
-              stroke="currentColor"
-              strokeWidth="2"
-              opacity="0.8"
-            />
-            <path
-              d="M8 12c0-3 2-5 4-5s4 2 4 5-2 5-4 5-4-2-4-5Z"
-              fill="currentColor"
-              opacity="0.25"
-            />
-          </svg>
+          <img
+            src="/img/logo-rm.png"
+            alt="Rick & Morty logo"
+            className="w-8 h-8 object-contain"
+            loading="eager"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = "/img/no-image.png";
+            }}
+          />
           <span className="font-semibold">Rick & Morty</span>
         </NavLink>
 

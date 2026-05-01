@@ -8,10 +8,10 @@ const ConfirmDialog = forwardRef(function ConfirmDialog(_, ref) {
   const dialogRef = useRef(null);
 
   const [state, setState] = useState({
-    title: "Confirmar",
-    message: "¿Seguro?",
-    confirmText: "Confirmar",
-    cancelText: "Cancelar",
+    title: "Confirm",
+    message: "Are you sure?",
+    confirmText: "Confirm",
+    cancelText: "Cancel",
     danger: false,
     // Dark pattern (intencional): el botón "confirmar" será más llamativo que "cancelar"
     // y el texto de cancelar será menos visible. Esto NO es buena práctica, se hace
@@ -46,7 +46,7 @@ const ConfirmDialog = forwardRef(function ConfirmDialog(_, ref) {
     <dialog
       ref={dialogRef}
       className="backdrop:bg-black/70 rounded-xl w-[min(520px,92vw)] p-0 bg-slate-950 text-slate-100 border border-slate-800"
-      aria-label="Confirm dialog"
+      aria-label="Confirmation dialog"
     >
       <div className="p-5">
         <h2 className="text-lg font-semibold">{state.title}</h2>
